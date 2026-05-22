@@ -1,11 +1,11 @@
 import { Pool } from "pg";
 import config from "../config/env.config";
 
-const pool = new Pool({
+export const pool = new Pool({
     connectionString: config.connection_string,
 })
 
-const db_init = async () => {
+export const db_init = async () => {
     try {
         await pool.query(
             `
@@ -16,13 +16,14 @@ const db_init = async () => {
                 password VARCHAR(255) NOT NULL,
                 role VARCHAR(30) DEFAULT 'contributor',
                 created_at TIMESTAMP DEFAULT NOW(),
-                updated_at TIMESTAMP DEFAULT NOW()
+                updated_at TIMESTAMP DEFAULT NOW(),
+                CHECK (role IN ('contributor', 'maintainer'))
             )
             `
         );
 
         await pool.query(
-            `
+            ` 
             CREATE TABLE IF NOT EXISTS issues(
                 id SERIAL,
                 title VARCHAR(150) NOT NULL,
@@ -38,9 +39,9 @@ const db_init = async () => {
         )
 
         console.log("Database connected successully ")
+
     } catch (error) {
+        
         console.error("Error connecting to database:", error);
     }
 }
-
-export default db_init;

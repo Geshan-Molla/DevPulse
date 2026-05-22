@@ -1,5 +1,6 @@
 import app from "./app";
-import db_init from "./db";
+import { db_init } from "./db";
+
 
 const main = async () => {
 
