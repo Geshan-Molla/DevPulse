@@ -7,14 +7,32 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken"
 import { fetchUserByEmail } from "../../utils/fetchUserByEmail";
 
-const createUser = async(payload: IUser) =>{
+const createUser = async (payload: IUser) => {
 
-    const {name, email, password, role} = payload;
+    const { name, email, password, role } = payload;
 
-    if((role && !AllowedRoles.includes(role)) || (name && !name.trim()) || (email && !email.trim()) || (password && !password.trim())){
-        throw new Error("Invalid input");
+    // 1. Check for required fields
+    if (!name || !email || !password || !role) {
+        throw new Error("Missing required fields");
     }
-    
+
+    // 2. Validate formats
+    if (!name.trim() || !email.trim() || !password.trim()) {
+        throw new Error("Fields cannot be empty strings");
+    }
+
+    // 3. Validate Role
+    if (role && !AllowedRoles.includes(role)) {
+        throw new Error("Invalid role");
+    }
+
+    // 4. Check for extra keys
+    const allowedKeys = ["name", "email", "password", "role"];
+    const hasExtraKeys = Object.keys(payload).some(key => !allowedKeys.includes(key));
+    if (hasExtraKeys) {
+        throw new Error("Payload contains invalid fields");
+    }
+
     // valid email regx
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (email && !emailRegex.test(email)) {
@@ -23,7 +41,7 @@ const createUser = async(payload: IUser) =>{
 
     //check existing user by email
     const existingUser = await fetchUserByEmail(email);
-    if(existingUser.rows.length > 0){
+    if (existingUser.rows.length > 0) {
         throw new Error("Email already exists");
     }
 
@@ -37,20 +55,20 @@ const createUser = async(payload: IUser) =>{
         `,
         [name, email, hashedPassword, role]
     );
-    
+
     delete result.rows[0].password
     return result.rows[0];
 }
 
-const loginUser = async(payload : ILoginUser) => {
+const loginUser = async (payload: ILoginUser) => {
 
     // check if payload only has the email and password properties
     const payloadKeys = Object.keys(payload);
-    if(payloadKeys.length !== 2 || !payloadKeys.includes("email") || !payloadKeys.includes("password")){
+    if (payloadKeys.length !== 2 || !payloadKeys.includes("email") || !payloadKeys.includes("password")) {
         throw new Error("Invalid input");
     }
 
-    const {email, password} = payload;
+    const { email, password } = payload;
 
     const result = await pool.query(
         `
@@ -58,7 +76,7 @@ const loginUser = async(payload : ILoginUser) => {
         `, [email]
     )
 
-    if(result.rows.length === 0 ){
+    if (result.rows.length === 0) {
         throw new Error("Invalid email or password")
     }
 
@@ -66,13 +84,13 @@ const loginUser = async(payload : ILoginUser) => {
 
     const isPasswordValid = bcrypt.compareSync(password, user.password);
 
-    if(!isPasswordValid){
+    if (!isPasswordValid) {
         throw new Error("Invalid email or password")
     }
 
     delete user.password;
 
-    const jwtPayload : IJwtPayload={
+    const jwtPayload: IJwtPayload = {
         id: user.id,
         name: user.name,
         email: user.email,
@@ -82,9 +100,9 @@ const loginUser = async(payload : ILoginUser) => {
     const accessToken = jwt.sign(jwtPayload, config.jwt_secret as string, { expiresIn: "1d" })
 
     return {
-        token : accessToken,
+        token: accessToken,
         user: user
     }
-}    
+}
 
-export const userService = {createUser, loginUser};
+export const userService = { createUser, loginUser };

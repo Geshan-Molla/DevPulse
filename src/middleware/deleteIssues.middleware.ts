@@ -1,8 +1,8 @@
 import type { NextFunction, Request, Response } from "express";
-import commonResponse from "../utils/commonResponse";
 import jwtValidation from "../utils/jwtValidation";
 import { fetchUserByEmail } from "../utils/fetchUserByEmail";
 import { fetchIssueById } from "../utils/fetchIssueById";
+import commonError from "../utils/commonError";
 
 
 export const deleteIssuesMiddleware = async (req: Request, res: Response, next: NextFunction) => {
@@ -15,11 +15,15 @@ export const deleteIssuesMiddleware = async (req: Request, res: Response, next: 
 
         // if token available 
         if (!token) {
-            return commonResponse(res, { status: 401, success: false, message: "Unauthorized" })
+            return commonError(res, { status: 401, success: false, message: "Unauthorized" , error: "No token provided" })
         }
 
         // if available then verify
         const decoded = jwtValidation(token);
+
+        if (!decoded || !decoded.email || !Object.keys(decoded).every(key => ["id", "name", "email", "role", "iat", "exp"].includes(key))) {
+            return commonError(res, { status: 401, success: false, message: "Unauthorized" , error: "Invalid token" })
+        }
 
         // query for user by decoded.email
         const fetchUser = await fetchUserByEmail(decoded.email as string);
@@ -31,11 +35,11 @@ export const deleteIssuesMiddleware = async (req: Request, res: Response, next: 
         const singleIssue = fetchIssue.rows[0];
 
         if(fetchUser.rows.length === 0){
-            return commonResponse(res, { status: 401, success: false, message: "Unauthorized" })
+            return commonError(res, { status: 401, success: false, message: "Unauthorized" , error: "No user found with the provided email" })
         }
 
         if(fetchIssue.rows.length === 0){
-            return commonResponse(res, { status: 404, success: false, message: "Issue not found", errors: "No issue found with the provided id" })
+            return commonError(res, { status: 404, success: false, message: "Issue not found", error: "No issue found with the provided id" })
         }
 
         //Access: Maintainer only
@@ -43,10 +47,10 @@ export const deleteIssuesMiddleware = async (req: Request, res: Response, next: 
             next();
         }
         else{
-            return commonResponse(res, { status: 403, success: false, message: "Forbidden" , errors: "You don't have permission to delete this issue"})
+            return commonError(res, { status: 403, success: false, message: "Forbidden" , error: "You don't have permission to delete this issue"})
         }
 
-    } catch (error: any) {
-        commonResponse(res, { status: 401, success: false, message: "Unauthorized", errors: error.message })
+    } catch (error: unknown) {
+        commonError(res, { status: 401, success: false, message: "Unauthorized", error: error instanceof Error ? error.message : "An unknown error occurred" })
     }
 }

@@ -6,7 +6,6 @@ type CommonResponse<T> = {
     success: boolean;
     message?: string;
     data?: T;
-    errors?: any;
 }
 
 const commonResponse = <T>(res: Response, data: CommonResponse<T>) => {
@@ -15,7 +14,6 @@ const commonResponse = <T>(res: Response, data: CommonResponse<T>) => {
             success: data.success,
             message: data.message,
             data: data.data,
-            errors: data.errors
         }
     )
 

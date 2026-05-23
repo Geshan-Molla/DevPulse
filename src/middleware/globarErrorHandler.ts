@@ -1,15 +1,16 @@
 import type { NextFunction, Request, Response } from "express";
 
 const globalErrorHandler = (
-  err: any,
+  err: unknown,
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
+  const message = err instanceof Error ? err.message : "Internal Server Error";
 
   res.status(500).json({
     success: false,
-    message: err.message || "Internal Server Error",
+    message: message,
   });
 };
 

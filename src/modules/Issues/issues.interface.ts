@@ -1,22 +1,21 @@
 export interface IIssues {
     title: string;
     description: string;
-    type: string;
-    status?: string;
+    type: IssuesType;
 }
 
-export const IssuesTypes = {
+export const issuesTypes = {
     bug: "bug",
     feature_request: "feature_request",
-} 
+} as const;
 
-export type IssuesType = typeof IssuesTypes[keyof typeof IssuesTypes];
+export type IssuesType = typeof issuesTypes[keyof typeof issuesTypes];
 
 export const IssuesStatus = {
     open: "open",
     in_progress: "in_progress",
     resolved: "resolved"
-}
+} as const;
 export type IssuesStatusType = typeof IssuesStatus[keyof typeof IssuesStatus];
 
 
@@ -27,7 +26,7 @@ export type QueryType ={
 }
 
 export const AllowedSortValues = ['newest', 'oldest', undefined] as const;
-export const AllowedTypeValues = [IssuesTypes.bug, IssuesTypes.feature_request, undefined] as const;
+export const AllowedTypeValues = [issuesTypes.bug, issuesTypes.feature_request, undefined] as const;
 export const AllowedStatusValues = [IssuesStatus.open, IssuesStatus.in_progress, IssuesStatus.resolved, undefined] as const;
 
 export type Reporter = {
@@ -36,7 +35,7 @@ export type Reporter = {
     role: string;
 }
 
-export type IssuesResponse = {
+export type IssuesResponseType = {
     id: number;
     title: string;
     description: string;
