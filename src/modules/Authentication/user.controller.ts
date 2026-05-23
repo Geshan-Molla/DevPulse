@@ -1,12 +1,13 @@
 import type { Request, Response } from "express";
 import { userService } from "./user.service";
 import commonResponse from "../../utils/commonResponse";
+import type { ILoginUser, IUser } from "./user.interface";
 
 
 const signup = async (req: Request, res: Response) => {
     try {
 
-        const result = await userService.createUser(req.body);
+        const result = await userService.createUser(req.body as IUser);
 
         commonResponse(res, { status: 201, success: true, message: "User registered successfully", data: result })
 
@@ -20,7 +21,7 @@ const signup = async (req: Request, res: Response) => {
 
 const login = async (req: Request, res: Response) => {
     try {
-        const result = await userService.loginUser(req.body);
+        const result = await userService.loginUser(req.body as ILoginUser);
 
         commonResponse(res, { status: 200, success: true, message: "Login successful", data: result });
 
