@@ -87,8 +87,11 @@ const getIssuesFromDatabase = async (query: QueryType) => {
 
 }
 
-
 const getIssuesByIdFromDatabase = async (id: string) => {
+
+    if(!id || isNaN(Number(id))) {
+        throw new Error("Invalid issue id");
+    }
 
     const issue : { rows: DBIssuesType[] } = await pool.query(
         `
