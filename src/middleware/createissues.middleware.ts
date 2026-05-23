@@ -1,8 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import commonResponse from "../utils/commonResponse";
-import jwt, { type JwtPayload } from "jsonwebtoken";
-import { pool } from "../db";
-import type { IJwtPayload } from "../types/jwtPayload.interface";
+import jwtValidation from "../utils/jwtValidation";
+import { fetchUserByEmail } from "../utils/fetchUserByEmail";
 
 export const createIssuesMiddleware = async (req: Request, res: Response, next: NextFunction) => {
 
@@ -16,14 +15,10 @@ export const createIssuesMiddleware = async (req: Request, res: Response, next: 
         }
 
         // if available then verify
-        const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as IJwtPayload;
+        const decoded = jwtValidation(token);
 
         // query for user by decoded.email
-        const fetchUser = await pool.query(
-            `
-            SELECT * FROM users WHERE email = $1
-            `,[decoded.email]
-        )
+        const fetchUser = await fetchUserByEmail(decoded.email);
 
         if(fetchUser.rows.length === 0){
             return commonResponse(res, { status: 401, success: false, message: "Unauthorized" })

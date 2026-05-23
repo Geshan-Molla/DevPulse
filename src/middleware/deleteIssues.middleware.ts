@@ -1,8 +1,8 @@
 import type { NextFunction, Request, Response } from "express";
 import commonResponse from "../utils/commonResponse";
-import jwt from "jsonwebtoken";
-import { pool } from "../db";
-import type { IJwtPayload } from "../types/jwtPayload.interface";
+import jwtValidation from "../utils/jwtValidation";
+import { fetchUserByEmail } from "../utils/fetchUserByEmail";
+import { fetchIssueById } from "../utils/fetchIssueById";
 
 
 export const deleteIssuesMiddleware = async (req: Request, res: Response, next: NextFunction) => {
@@ -19,21 +19,13 @@ export const deleteIssuesMiddleware = async (req: Request, res: Response, next: 
         }
 
         // if available then verify
-        const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as IJwtPayload;
+        const decoded = jwtValidation(token);
 
         // query for user by decoded.email
-        const fetchUser = await pool.query(
-            `
-            SELECT * FROM users WHERE email = $1
-            `,[decoded.email]
-        )
+        const fetchUser = await fetchUserByEmail(decoded.email as string);
 
         // query for issue by id
-        const fetchIssue = await pool.query(
-            `
-            SELECT * FROM issues WHERE id = $1
-            `, [id]
-        )
+        const fetchIssue = await fetchIssueById(id as string);
 
         const singleUser = fetchUser.rows[0];
         const singleIssue = fetchIssue.rows[0];
