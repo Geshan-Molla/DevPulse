@@ -40,18 +40,18 @@ A professional issue tracking system API built with Node.js, Express, and Postgr
 
 ## 🌐 API Endpoints
 
-### Base API: `/api/issues`
+### Base API: `/api/`
 
 ### Authentication
-- `POST /signup`: Register a new user.
-- `POST /login`: Log in to receive a JWT token.
+- `POST /auth/signup`: Register a new user.
+- `POST /auth/login`: Log in to receive a JWT token.
 
 ### Issues
-- `POST /`: Create a new issue (requires authentication).
-- `GET /`: List all issues.
-- `GET /:id`: Retrieve a specific issue by ID.
-- `PATCH /:id`: Update an existing issue (requires authentication).
-- `DELETE /:id`: Delete an issue (requires authentication).
+- `POST /issues`: Create a new issue (requires authentication).
+- `GET /issues`: List all issues.
+- `GET /issues/:id`: Retrieve a specific issue by ID.
+- `PATCH /issues/:id`: Update an existing issue (requires authentication).
+- `DELETE /issues/:id`: Delete an issue (requires authentication).
 
 ## 🗄️ Database Schema Summary
 
