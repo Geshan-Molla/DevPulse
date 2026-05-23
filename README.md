@@ -21,7 +21,7 @@ A professional issue tracking system API built with Node.js, Express, and Postgr
 ## ⚙️ Setup Steps
 1. **Clone the repository**:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/Muzahidul-Islam-Zehad/DevPulse
    cd assignment-2
    ```
 2. **Install dependencies**:
