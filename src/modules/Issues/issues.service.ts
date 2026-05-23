@@ -1,7 +1,7 @@
 import { Query } from "pg";
 import { pool } from "../../db";
 import type { IJwtPayload } from "../../types/jwtPayload.interface";
-import {AllowedSortValues, AllowedStatusValues, AllowedTypeValues, IssuesStatus, IssuesTypes, type IIssues, type IssuesStatusType, type IssuesType, type QueryType } from "./issues.interface";
+import {AllowedSortValues, AllowedStatusValues, AllowedTypeValues, IssuesStatus, IssuesTypes, type IIssues , type IssuesResponse, type QueryType } from "./issues.interface";
 
 const createIssuesInDatabase = async (user: IJwtPayload, body: IIssues) => {
 
@@ -80,10 +80,46 @@ const getIssuesFromDatabase = async (query : QueryType) =>{
 }
 
 
+const getIssuesByIdFromDatabase = async (id : string) =>{
+    
+    const issue = await pool.query(
+        `
+        SELECT * FROM issues WHERE id = $1
+        `, [id]
+    )
+
+    const singleIssue = issue.rows[0];
+
+    if(!singleIssue){
+        throw new Error("Issue not found");
+    }
+
+    const reporter = await pool.query(
+        `
+        SELECT * FROM users WHERE id = $1
+        `, [singleIssue.reporter_id]
+    )
+
+    const reporterData = reporter.rows[0];
+    delete reporterData.password;
+
+    const result = {
+        id: singleIssue.id,
+        title: singleIssue.title,
+        description: singleIssue.description,
+        type: singleIssue.type,
+        status: singleIssue.status,
+        reporter: { id: reporterData.id, name: reporterData.name, role: reporterData.role },
+        created_at: singleIssue.created_at,
+        updated_at: singleIssue.updated_at
+    }
+    return result;
+}
 
 
 
 export const issuesService = {
     createIssuesInDatabase,
-    getIssuesFromDatabase
+    getIssuesFromDatabase,
+    getIssuesByIdFromDatabase
 }

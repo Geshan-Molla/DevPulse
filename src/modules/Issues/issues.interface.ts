@@ -36,7 +36,7 @@ export type Reporter = {
     role: string;
 }
 
-export interface IIssuesResponse {
+export type IssuesResponse = {
     id: number;
     title: string;
     description: string;

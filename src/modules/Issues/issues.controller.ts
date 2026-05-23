@@ -25,8 +25,19 @@ const getIssues = async (req: Request, res: Response) => {
         commonResponse(res, { status: 400, success: false, message: "Failed to retrieve issues", errors: error.message })
     }
 }
+    
+const getIssuesById = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const result = await issuesService.getIssuesByIdFromDatabase(id as string);
+        commonResponse(res, { status: 200, success: true, data: result })
+    } catch (error : any) {
+        commonResponse(res, { status: 400, success: false, message: "Failed to retrieve issue", errors: error.message })
+    }
+}
 
 export const issuesController = {
     createIssues,
-    getIssues
+    getIssues,
+    getIssuesById
 }

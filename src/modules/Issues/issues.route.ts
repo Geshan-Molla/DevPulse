@@ -7,5 +7,6 @@ const router = Router();
 
 router.post('/', createIssuesMiddleware, issuesController.createIssues )
 router.get('/', issuesController.getIssues)
+router.get('/:id', issuesController.getIssuesById)
 
 export const issuesRouter = router;
