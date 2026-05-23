@@ -128,16 +128,16 @@ const getIssuesByIdFromDatabase = async (id: string) => {
 
 
 const updateIssuesInDatabase = async (id: string, body: IIssues) => {
-    const { title, description, type } = body;
+    const { title, description, type, status } = body;
 
-    if ((title && title.length > 150) || (description && description.length < 20) || (type && !AllowedTypeValues.includes(type))) {
+    if ((title && title.length > 150) || (description && description.length < 20) || (type && !AllowedTypeValues.includes(type)) || (status && !AllowedStatusValues.includes(status))) {
         throw new Error("Invalid input data");
     }
 
     const result : { rows: DBIssuesType[] } = await pool.query(
         `
-        UPDATE issues SET title = COALESCE($1, title), description = COALESCE($2, description), type = COALESCE($3, type), updated_at = NOW() WHERE id = $4 RETURNING *
-        `, [title, description, type, id]
+        UPDATE issues SET title = COALESCE($1, title), description = COALESCE($2, description), type = COALESCE($3, type), status = COALESCE($4, status), updated_at = NOW() WHERE id = $5 RETURNING *
+        `, [title, description, type, status, id]
     )
 
     if(result.rows.length === 0){

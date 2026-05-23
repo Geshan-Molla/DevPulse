@@ -2,6 +2,7 @@ export interface IIssues {
     title: string;
     description: string;
     type: IssuesType;
+    status?: IssuesStatusType;
 }
 
 export const issuesTypes = {
