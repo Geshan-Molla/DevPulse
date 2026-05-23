@@ -1,4 +1,4 @@
-# Issue Tracker API
+# DevPulse - Issue Tracking API
 
 A professional issue tracking system API built with Node.js, Express, and PostgreSQL.
 
