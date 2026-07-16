@@ -71,3 +71,5 @@ A professional issue tracking system API built with Node.js, Express, and Postgr
 - `status` ('open' | 'in_progress' | 'resolved')
 - `reporter_id` (INTEGER, FK to users)
 - `created_at` / `updated_at` (TIMESTAMP)
+
+forked from zehad
